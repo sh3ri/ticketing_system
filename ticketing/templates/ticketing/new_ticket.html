@@ -1,0 +1,21 @@
+{% extends 'users/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-9" style="overflow: hidden">
+            <div style="overflow: auto; padding: 30px 30px 0 30px;">
+                <form enctype="multipart/form-data" method="post"> {% csrf_token %}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">New Ticket</legend>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class="btn btn-outline-info" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+{% if not user.is_authenticated %}
+not authenticated
+{% else %}
+<div>
+    <div id="sidebar">
+        {% for chat in tickets %}
+        <div>
+            <button class="btn sidebar-item priority-{{ chat.priority }} priority-color-{{ chat.priority }}"
+                    onclick="redirect({{ forloop.counter0 }})">
+                <!--            <button class="btn-6"-->
+                <!--               <a href="{% url 'ticketing:ticket_detail' forloop.counter0 %}">{{ chat.title }}</a>-->
+                {{ chat.title }}
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if any_ticket_selected %}
+<div id="ticket">
+    <header class="priority-color-{{ ticket.priority }}" style="padding:10px 10%;">
+        <h2 style="display: inline;{% if ticket.priority != '1' %}
+            color: white; {% endif %} ">
+            <strong>{{ ticket.title }}</strong>
+        </h2>
+        <span class="ticket-num-color-{{ ticket.priority }}">Ticket #{{ ticket.ticket_num }}</span>
+        <br class="clear-both;">
+    </header>
+    <main style="padding: 20px 10%;" class="border-bottom mb-4">
+        <div style="overflow-y: auto;max-height: 70vh">
+            {% for message in ticket.chat %}
+            <div style="overflow: auto;">
+                <img class="rounded-circle account-img"
+                {% if message.sender == 'admin' %} src="/media/admin-profile.png" style="float:right"
+                {% else %} src="{{ user.profile.image.url }}"
+                {% endif %} >
+                <div class="chat-item {% if message.sender == 'admin' %} admin-bubble {% else %} user-bubble {% endif %}">
+                    <!--                <p class="small" {% if message.sender != 'admin' %} style="color:#55f" {% endif %}>{{ message.sender }}</p>-->
+                    <span style="display:block; overflow: auto; ">
+                        {{ message.text }}
+                    </span>
+                    {% if message.attached_file_url %}
+                    <a href="{{ message.attached_file_url }}" id="attachment-id" class="attachment">Open Attachment</a>
+                    {% endif %}
+                </div>
+            </div>
+            <p style="clear:both;"></p>
+            {% endfor %}
+        </div>
+        <div style="padding:20px; margin:10px;">
+            <form enctype="multipart/form-data" method="post"> {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">New</legend>
+                    {{ new_message_form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% else %}
+<div class="text-muted nothing-to-show">
+    <p id="nothing-text">
+        Select a ticket to start chatting
+    </p>
+</div>
+{% endif %}
+<script>
+    function redirect(i){
+        window.location.href = '/ticket/' + i;
+    }
+
+
+
+
+</script>
+{% endif %}
+{% endblock %}
